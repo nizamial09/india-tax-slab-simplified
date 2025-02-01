@@ -2,7 +2,7 @@
 
 A simple tax slab calculator to compute income tax based on predefined tax slabs announced for 2025-26. The calculator takes an input of income and outputs the applicable tax according to the specified tax rates. Tax percentages are fixed according to the 2025-26 tax rates.
 
-![Simple Tax Slab Calculator](https://github.com/nizamial09/india-tax-slab-simplified/blob/main/sts_img.png?raw=true)
+![Simple Tax Slab Calculator](https://raw.githubusercontent.com/nizamial09/india-tax-slab-simplified/refs/heads/main/templates/stc_img.png)
 
 
 ## Features
