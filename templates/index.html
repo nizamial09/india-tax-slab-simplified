@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #result {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Simple Tax Slab Calculator</h2>
+    <p>A simple tax calculator based on slab to understand the 2025-26 Income tax slabs.</p>
+    <p>I am not caring the other complex parameters like the deductions and all...</p>
+    <form id="taxForm">
+        <label for="income">Enter Your Income:</label>
+        <input type="number" id="income" name="income" placeholder="Enter your income" required>
+        <button type="submit">Calculate Tax</button>
+    </form>
+    <p id="result"></p>
+
+    <p id="slabs"></p>
+
+    <script>
+        function formatRupee(amount) {
+            const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+            return formattedAmount;
+        }
+        document.getElementById("taxForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            let income = document.getElementById("income").value;
+
+            fetch("/tax_slab/", {
+                method: "POST",
+                body: new URLSearchParams({ income: income })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = 
+                    `<p>Yearly Tax: <b>${formatRupee(data.total_tax_per_year)}</b></p>
+                     <p>Monthly Tax: <b>${formatRupee(data.total_tax_per_month)}</b></p>`;
+            })
+
+            fetch("/tax_slab?" + new URLSearchParams({
+                income: income
+            }), {
+                method: "GET",
+            })
+            .then(response => response.json())
+            .then((data) => {
+                document.getElementById("slabs").innerHTML = '';
+                if (data.slabs.length === 0) {
+                    return;
+                }
+                for (let i = 0; i < data.slabs.length; i++) {
+                    const multiplier = 400000;
+                    const from = i * multiplier;
+                    let to = (i + 1) * multiplier;
+
+                    if (i === data.slabs.length - 1) {
+                        to = income;
+                    }
+
+                    if (data.slabs[i] === 0) {
+                        continue;
+                    }
+
+                    document.getElementById("slabs").innerHTML += 
+                        `<p>Slab ${i + 1} ${formatRupee(from)} to ${formatRupee(to)} : <b>${formatRupee(data.slabs[i])}</b></p>`;
+                }
+            })
+        });
+    </script>
+</body>
+</html>
